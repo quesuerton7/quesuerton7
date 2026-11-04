@@ -1,3 +1,4 @@
+import './globals.css'
 
 export const metadata = {
   title: 'Qué Suertón 7',
@@ -11,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body style={{ margin: 0, padding: 0 }}>{children}</body>
+      <body className="bg-slate-950 text-slate-100">{children}</body>
     </html>
   )
 }
