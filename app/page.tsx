@@ -15,7 +15,7 @@ interface SorteoItem {
   usuario_whatsapp?: string;
 }
 
-export default function SorteoPage() {
+export default function Home() {
   const [numeros, setNumeros] = useState<SorteoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedNumero, setSelectedNumero] = useState<SorteoItem | null>(null);
@@ -62,7 +62,7 @@ export default function SorteoPage() {
     if (error) {
       alert('Hubo un error al reservar el número.');
     } else {
-      alert(`¡Número ${selectedNumero.numero.toString().padStart(2, '0')} reservado con éxito! Pronto te contactaremos.`);
+      alert(`¡Número ${selectedNumero.numero.toString().padStart(2, '0')} reservado con éxito! Pronto te contactaremos para confirmar el pago.`);
       setSelectedNumero(null);
       setNombre('');
       setWhatsapp('');
@@ -71,81 +71,68 @@ export default function SorteoPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-900 text-white p-6">
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-4xl font-extrabold text-yellow-400 mb-2">Qué Suertón 7</h1>
-        <p className="text-slate-300 mb-8">Sorteo Relámpago - Elegí tu número favorito ($1.000)</p>
+    <main className="min-h-screen bg-slate-950 text-white font-sans pb-16">
+      {/* HEADER / BANNER */}
+      <header className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 border-b border-purple-800/40 py-12 px-4 text-center">
+        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-500 mb-3 drop-shadow-md">
+          Qué Suertón 7
+        </h1>
+        <p className="text-lg text-slate-300 max-w-xl mx-auto">
+          ¡Participá de nuestros sorteos relámpago! Elegí tu número de la suerte, reservalo y ganá al instante.
+        </p>
+      </header>
 
-        {loading ? (
-          <p className="text-xl">Cargando tablero...</p>
-        ) : (
-          <div className="grid grid-cols-5 sm:grid-cols-10 gap-3 mb-10">
-            {numeros.map((item) => {
-              let bg = 'bg-emerald-600 hover:bg-emerald-500 cursor-pointer';
-              if (item.estado === 'reservado') bg = 'bg-amber-500 opacity-60 cursor-not-allowed';
-              if (item.estado === 'pagado') bg = 'bg-rose-600 opacity-60 cursor-not-allowed';
-
-              return (
-                <button
-                  key={item.numero}
-                  onClick={() => handleSelect(item)}
-                  disabled={item.estado !== 'libre'}
-                  className={`py-3 rounded-lg font-bold text-lg transition shadow-md ${bg}`}
-                >
-                  {item.numero.toString().padStart(2, '0')}
-                </button>
-              );
-            })}
+      <div className="max-w-5xl mx-auto px-4 mt-10 space-y-12">
+        {/* SECCIÓN JUEGO RELÁMPAGO (GRILLA DE 100 NÚMEROS) */}
+        <section className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur">
+          <div className="text-center mb-8">
+            <span className="inline-block bg-yellow-500/10 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+              Sorteo Activo
+            </span>
+            <h2 className="text-3xl font-bold text-white">Tablero de 100 Números (00 al 99)</h2>
+            <p className="text-slate-400 text-sm mt-1">Valor por número: <strong className="text-emerald-400">$1.000</strong></p>
           </div>
-        )}
 
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-yellow-400 border-t-transparent"></div>
+              <p className="text-slate-400 mt-3 text-sm">Cargando números disponibles...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2.5 max-w-3xl mx-auto mb-8">
+              {numeros.map((item) => {
+                let statusClasses = 'bg-slate-800 hover:bg-emerald-600 text-emerald-400 hover:text-white border-slate-700 hover:border-emerald-500 cursor-pointer';
+                if (item.estado === 'reservado') statusClasses = 'bg-amber-500/20 text-amber-400 border-amber-500/40 cursor-not-allowed';
+                if (item.estado === 'pagado') statusClasses = 'bg-rose-500/20 text-rose-400 border-rose-500/40 cursor-not-allowed';
+
+                return (
+                  <button
+                    key={item.numero}
+                    onClick={() => handleSelect(item)}
+                    disabled={item.estado !== 'libre'}
+                    className={`py-2.5 rounded-lg font-mono font-bold text-base sm:text-lg border transition duration-150 ${statusClasses}`}
+                  >
+                    {item.numero.toString().padStart(2, '0')}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* LEYENDA ESTADOS */}
+          <div className="flex justify-center items-center gap-6 text-xs text-slate-400 border-t border-slate-800 pt-4">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-slate-800 border border-slate-700"></span> Libre
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-amber-500/40 border border-amber-500"></span> Reservado
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-rose-500/40 border border-rose-500"></span> Pagado
+            </div>
+          </div>
+        </section>
+
+        {/* MODAL / FORMULARIO DE RESERVA */}
         {selectedNumero && (
-          <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 max-w-md mx-auto text-left shadow-2xl">
-            <h2 className="text-2xl font-bold text-yellow-400 mb-4">
-              Reservar el número: #{selectedNumero.numero.toString().padStart(2, '0')}
-            </h2>
-            <form onSubmit={handleReservar} className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1 text-slate-300">Tu Nombre y Apellido:</label>
-                <input
-                  type="text"
-                  required
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  className="w-full p-2.5 rounded bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-yellow-400"
-                  placeholder="Ej: Juan Pérez"
-                />
-              </div>
-              <div>
-                <label className="block text-sm mb-1 text-slate-300">Tu WhatsApp:</label>
-                <input
-                  type="tel"
-                  required
-                  value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
-                  className="w-full p-2.5 rounded bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-yellow-400"
-                  placeholder="Ej: 1123456789"
-                />
-              </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedNumero(null)}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-bold rounded text-sm transition"
-                >
-                  Confirmar Reserva
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-      </div>
-    </main>
-  );
-}
+          <div className="fixed inset-
